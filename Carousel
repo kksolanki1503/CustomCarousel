@@ -1,0 +1,69 @@
+import CarouselData from './CarouselData'
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
+import { useEffect, useState } from 'react';
+import { SlideshowOutlined } from '@mui/icons-material';
+
+const Carousel = (props) => {
+  const showSlides =3;
+  const moveSlides = 1;
+  const [curr,setCurr] = useState(0);
+
+  // console.log(props.AutoPlay)
+  
+  const slideWidth = 100%showSlides?parseFloat(100/showSlides).toFixed(2):parseInt(100/showSlides);
+
+  const moveWidth = slideWidth%moveSlides?parseFloat(slideWidth*moveSlides).toFixed(2):parseInt(slideWidth*moveSlides);
+  
+
+ 
+const slides = CarouselData.map((data)=>(<div className= {`w-[${slideWidth}%]  flex-shrink-0 px-2 h-[280px]`}><img className='h-full w-full object-cover rounded-lg' src={data}/></div>))
+
+// console.log(slides)
+  const previourSlide = ()=>{
+    const isStarting = curr === 0;
+    const newValue = isStarting? Math.floor((CarouselData.length-1)/showSlides) : curr - 1 ;
+    setCurr(newValue);
+  }
+
+  const nextSlide = ()=>{
+    const isLast = curr ===  Math.floor((CarouselData.length-1)/showSlides);
+    const newValue = isLast ?  0: curr + 1;
+    setCurr(newValue);
+  }
+  // console.log(curr);
+  useEffect(()=>{
+      if(!props.AutoPlay) return 
+
+      const slideInterval = setInterval(nextSlide,5000)
+      console.log("hello")
+      return ()=> clearInterval(slideInterval)
+  },[curr])
+
+  
+
+  return (
+    <div className='relative border border-white'>
+      <div className='overflow-hidden w-[80%] m-auto my-8'>
+        <div className='flex m-auto duration-300' style={{transform:`translateX(-${curr*moveWidth}%)`}}>
+          { slides}
+        </div>
+
+        {/* buttons */}
+        <div className='absolute inset-0 flex justify-between items-center mx-2'>
+          <div className='p-2 bg-black/30 rounded-full flex justify-center items-center text-black hover:bg-black/50 duration-500' onClick={previourSlide}><NavigateBeforeIcon/></div>
+          <div className='p-2 bg-black/30 rounded-full flex justify-center items-center text-black hover:bg-black/50 duration-500' onClick={nextSlide}><NavigateNextIcon/></div>
+        </div>
+      </div>
+        {/* dots */}
+        <div className='absolute bottom-0 left-0 right-0 p-2'>
+            <div className='flex justify-center items-center gap-4 '>
+              {slides.slice(0, Math.floor((CarouselData.length-1)/showSlides)+1).map((_,index)=>(
+                <div className={`w-2 h-2 bg-black/50 rounded-full transition-all ${curr===index? "p-2":"bg-black/30"}`}></div>
+              ))}
+            </div>
+        </div>
+    </div>
+  )
+}
+export default Carousel
